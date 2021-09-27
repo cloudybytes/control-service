@@ -12,7 +12,7 @@ class Parse:
         self.parsedQuery = {}
         self.query = query
         # self.schema = schema
-        self.having_function = ''
+        self.aggr_function = ''
     
     def get_tokenized_elements(self):
         query = self.query
@@ -39,10 +39,17 @@ class Parse:
             self.join.extend(join_column_1.split('.'))
             self.join.extend(join_column_2.split('.'))
             self.parsedQuery['join'] = self.join
-        # elif 'group' in tokenized_query:
-        #     self.group_by_column = tokenized_query[tokenized_query.index('group')+2]
-        #     having_function = tokenized_query[tokenized_query.index('having')+1]
-
+        elif 'group' in tokenized_query:
+            self.group_by_column = tokenized_query[tokenized_query.index('group')+2]
+            having_function , having_operator, having_value = tokenized_query[tokenized_query.index('having')+1:]
+            aggr_function , having_column = having_function.split('(')
+            having_column=having_column.strip(")")
+            having_value=having_value.strip("; ")
+            self.aggr_function = aggr_function
+            self.having_condition = [having_column,having_operator,having_value]
+            self.parsedQuery['group_by_column'] = self.group_by_column
+            self.parsedQuery['having_condition'] = self.having_condition
+            self.parsedQuery['aggr_function'] = self.aggr_function
 
     def get_parsed_query(self):
         self.parse_query_string()

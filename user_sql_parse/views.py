@@ -1,4 +1,5 @@
-from django.http.response import HttpResponse
+from user_sql_parse.sql_parse import Parse
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
@@ -10,8 +11,12 @@ def user_sql_parse(sql_string):
 @csrf_exempt
 def user_sql_endpoint(request):
     if request.method == 'POST':
-        user_sql=request.POST['user_sql']
-        tokenized_sql = user_sql_parse(user_sql)
-        return HttpResponse('reached here '+"".join(tokenized_sql))
+        # user_sql=request.POST['user_sql']
+        user_sql = "Select user_id, rating from users inner join rating on users.user_id = rating.user_id where rating.rating > 3"
+        print(user_sql)
+        parsed_query = Parse(user_sql).get_parsed_query()
+        # tokenized_sql = user_sql_parse(user_sql)
+        # return HttpResponse('reached here '+"".join(tokenized_sql))
+        return JsonResponse(parsed_query)
 
 

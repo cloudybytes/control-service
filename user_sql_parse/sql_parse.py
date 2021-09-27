@@ -2,7 +2,7 @@ import json
 
 class Parse:
 
-    def __init__(self, query, schema):
+    def __init__(self, query):
         self.from_table = []
         self.join = []
         self.where = []
@@ -11,7 +11,8 @@ class Parse:
         self.having_condition = []
         self.parsedQuery = {}
         self.query = query
-        self.schema = schema
+        # self.schema = schema
+        self.having_function = ''
     
     def get_tokenized_elements(self):
         query = self.query
@@ -28,7 +29,8 @@ class Parse:
         self.select_columns = [x.strip(',') for x in tokenized_query[1:tokenized_query.index('from')] ]
         self.parsedQuery['select_columns'] = self.select_columns
         # join_type = tokenized_query[tokenized_query.index('join')-1]
-        join_type = " ".join(tokenized_query[tokenized_query.index(self.from_table[0]):tokenized_query.index('join')])
+        if 'join' in tokenized_query:
+            join_type = " ".join(tokenized_query[tokenized_query.index(self.from_table[0])+1:tokenized_query.index('join')])
         join_to_table = tokenized_query[tokenized_query.index('join')+1]
         self.join.append(join_type)
         if tokenized_query[tokenized_query.index('join')+2] == 'on':
@@ -36,8 +38,10 @@ class Parse:
             join_column_2 = tokenized_query[tokenized_query.index('join')+5]
             self.join.extend(join_column_1.split('.'))
             self.join.extend(join_column_2.split('.'))
-
-
+            self.parsedQuery['join'] = self.join
+        # elif 'group' in tokenized_query:
+        #     self.group_by_column = tokenized_query[tokenized_query.index('group')+2]
+        #     having_function = tokenized_query[tokenized_query.index('having')+1]
 
 
     def get_parsed_query(self):

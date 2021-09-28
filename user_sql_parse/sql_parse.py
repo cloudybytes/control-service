@@ -40,6 +40,10 @@ class Parse:
                 join_column_2 = tokenized_query[tokenized_query.index('join')+5]
                 self.join.extend(join_column_1.split('.'))            
                 self.join.extend(join_column_2.split('.'))
+            else:
+                self.join.extend([self.from_table,''])
+                self.join.extend([join_to_table,''])
+                # TODO find the implicit join column
             self.parsedQuery['join'] = self.join
         elif 'group' in tokenized_query:
             self.group_by_column = tokenized_query[tokenized_query.index('group')+2]

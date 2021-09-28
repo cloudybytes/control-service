@@ -2,8 +2,8 @@ import json
 
 class Parse:
 
-    def __init__(self, query):
-        self.from_table = []
+    def __init__(self, query, schema):
+        self.from_table = ''
         self.join = []
         self.where = []
         self.select_columns = []
@@ -11,7 +11,7 @@ class Parse:
         self.having_condition = []
         self.parsedQuery = {}
         self.query = query
-        # self.schema = schema
+        self.schema = schema
         self.aggr_function = ''
     
     def get_tokenized_elements(self):
@@ -24,20 +24,22 @@ class Parse:
     
     def parse_query_string(self):
         tokenized_query = self.get_tokenized_elements()
-        self.from_table = [tokenized_query[tokenized_query.index('from')+1]]
+        self.from_table = tokenized_query[tokenized_query.index('from')+1]
         self.parsedQuery['from_table'] = self.from_table
         self.select_columns = [x.strip(',') for x in tokenized_query[1:tokenized_query.index('from')] ]
+        if self.select_columns[0] == "*":
+            self.select_columns = list(self.schema[self.from_table])
         self.parsedQuery['select_columns'] = self.select_columns
         # join_type = tokenized_query[tokenized_query.index('join')-1]
         if 'join' in tokenized_query:
-            join_type = " ".join(tokenized_query[tokenized_query.index(self.from_table[0])+1:tokenized_query.index('join')])
-        join_to_table = tokenized_query[tokenized_query.index('join')+1]
-        self.join.append(join_type)
-        if tokenized_query[tokenized_query.index('join')+2] == 'on':
-            join_column_1 = tokenized_query[tokenized_query.index('join')+3]
-            join_column_2 = tokenized_query[tokenized_query.index('join')+5]
-            self.join.extend(join_column_1.split('.'))
-            self.join.extend(join_column_2.split('.'))
+            join_type = " ".join(tokenized_query[tokenized_query.index(self.from_table)+1:tokenized_query.index('join')])
+            join_to_table = tokenized_query[tokenized_query.index('join')+1]
+            self.join.append(join_type)
+            if tokenized_query[tokenized_query.index('join')+2] == 'on':
+                join_column_1 = tokenized_query[tokenized_query.index('join')+3]
+                join_column_2 = tokenized_query[tokenized_query.index('join')+5]
+                self.join.extend(join_column_1.split('.'))            
+                self.join.extend(join_column_2.split('.'))
             self.parsedQuery['join'] = self.join
         elif 'group' in tokenized_query:
             self.group_by_column = tokenized_query[tokenized_query.index('group')+2]

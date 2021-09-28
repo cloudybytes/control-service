@@ -32,7 +32,7 @@ class Parse:
         self.parsedQuery['select_columns'] = self.select_columns
         # join_type = tokenized_query[tokenized_query.index('join')-1]
         if 'join' in tokenized_query:
-            join_type = " ".join(tokenized_query[tokenized_query.index(self.from_table)+1:tokenized_query.index('join')])
+            join_type = "_".join(tokenized_query[tokenized_query.index(self.from_table)+1:tokenized_query.index('join')])
             join_to_table = tokenized_query[tokenized_query.index('join')+1]
             self.join.append(join_type)
             if tokenized_query[tokenized_query.index('join')+2] == 'on':

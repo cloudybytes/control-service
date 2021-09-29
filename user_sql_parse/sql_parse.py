@@ -16,7 +16,7 @@ class Parse:
     
     def get_tokenized_elements(self):
         query = self.query
-        query = query.lower()
+        query = query.lower() #TODO: can't do as it will change the case in statements with LIKE in where condition
         query = query.strip()
         tokenized_query = query.split()
         return tokenized_query
@@ -31,6 +31,8 @@ class Parse:
             self.select_columns = list(self.schema[self.from_table])
         self.parsedQuery['select_columns'] = self.select_columns
         # join_type = tokenized_query[tokenized_query.index('join')-1]
+        self.where = tokenized_query[tokenized_query.index('where')+1:tokenized_query.index('where')+4] # LIKE is not taken care of
+        self.parsedQuery['where'] = self.where
         if 'join' in tokenized_query:
             join_type = " ".join(tokenized_query[tokenized_query.index(self.from_table)+1:tokenized_query.index('join')])
             join_to_table = tokenized_query[tokenized_query.index('join')+1]
@@ -48,9 +50,9 @@ class Parse:
             having_column=having_column.strip(")")
             having_value=having_value.strip("; ")
             self.aggr_function = aggr_function
-            self.having_condition = [having_column,having_operator,having_value]
+            self.having_condition = [having_column,having_operator,having_value] #TODO: if '=' replace it with '=='
             self.parsedQuery['group_by_column'] = self.group_by_column
-            self.parsedQuery['having_condition'] = self.having_condition
+            self.parsedQuery['having_condition'] = self.having_condition 
             self.parsedQuery['aggr_function'] = self.aggr_function
 
     def get_parsed_query(self):

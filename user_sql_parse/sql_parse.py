@@ -34,7 +34,7 @@ class Parse:
         self.where = tokenized_query[tokenized_query.index('where')+1:tokenized_query.index('where')+4] # LIKE is not taken care of
         self.parsedQuery['where'] = self.where
         if 'join' in tokenized_query:
-            join_type = " ".join(tokenized_query[tokenized_query.index(self.from_table)+1:tokenized_query.index('join')])
+            join_type = "_".join(tokenized_query[tokenized_query.index(self.from_table)+1:tokenized_query.index('join')])
             join_to_table = tokenized_query[tokenized_query.index('join')+1]
             self.join.append(join_type)
             if tokenized_query[tokenized_query.index('join')+2] == 'on':
@@ -42,6 +42,10 @@ class Parse:
                 join_column_2 = tokenized_query[tokenized_query.index('join')+5]
                 self.join.extend(join_column_1.split('.'))            
                 self.join.extend(join_column_2.split('.'))
+            else:
+                self.join.extend([self.from_table,''])
+                self.join.extend([join_to_table,''])
+                # TODO find the implicit join column
             self.parsedQuery['join'] = self.join
         elif 'group' in tokenized_query:
             self.group_by_column = tokenized_query[tokenized_query.index('group')+2]

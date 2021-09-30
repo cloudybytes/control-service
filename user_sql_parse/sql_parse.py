@@ -1,4 +1,5 @@
 import json
+import re
 
 class Parse:
 
@@ -31,8 +32,13 @@ class Parse:
             self.select_columns = list(self.schema[self.from_table])
         self.parsedQuery['select_columns'] = self.select_columns
         # join_type = tokenized_query[tokenized_query.index('join')-1]
-        self.where = tokenized_query[tokenized_query.index('where')+1:tokenized_query.index('where')+4] # LIKE is not taken care of
-        self.parsedQuery['where'] = self.where
+        if 'where' in tokenized_query:
+            self.where = tokenized_query[tokenized_query.index('where')+1:tokenized_query.index('where')+4] # LIKE is not taken care of
+            if self.where[1] == 'like':
+                self.where[2] = re.search(r"'([^']+?)'", self.query).groups()[0] 
+            if self.where[1] == '=':
+                self.where = '=='                    
+            self.parsedQuery['where'] = self.where
         if 'join' in tokenized_query:
             join_type = "_".join(tokenized_query[tokenized_query.index(self.from_table)+1:tokenized_query.index('join')])
             join_to_table = tokenized_query[tokenized_query.index('join')+1]

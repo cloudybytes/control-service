@@ -28,7 +28,9 @@ class Parse:
         self.from_table = tokenized_query[tokenized_query.index('from')+1]
         self.parsedQuery['from_table'] = self.from_table
         self.select_columns = [x.strip(',') for x in tokenized_query[1:tokenized_query.index('from')] ]
+        join_check = ''
         if self.select_columns[0] == "*":
+            join_check = self.select_columns[0]
             self.select_columns = list(self.schema[self.from_table])
         self.parsedQuery['select_columns'] = self.select_columns
         # join_type = tokenized_query[tokenized_query.index('join')-1]
@@ -42,6 +44,9 @@ class Parse:
         if 'join' in tokenized_query:
             join_type = "_".join(tokenized_query[tokenized_query.index(self.from_table)+1:tokenized_query.index('join')])
             join_to_table = tokenized_query[tokenized_query.index('join')+1]
+            if join_check == "*":            
+                join_table_columns = list(self.schema[join_to_table])
+                self.parsedQuery['select_columns'].extend(x for x in join_table_columns if x not in self.parsedQuery['select_columns'])
             self.join.append(join_type)
             if tokenized_query[tokenized_query.index('join')+2] == 'on':
                 join_column_1 = tokenized_query[tokenized_query.index('join')+3]

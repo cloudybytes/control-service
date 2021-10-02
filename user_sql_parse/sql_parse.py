@@ -54,8 +54,10 @@ class Parse:
                 self.join.extend(join_column_1.split('.'))            
                 self.join.extend(join_column_2.split('.'))
             else:
-                self.join.extend([self.from_table,''])
-                self.join.extend([join_to_table,''])
+                common_col =set(self.schema[self.from_table]).intersection(set(self.schema[join_to_table]))
+                print(common_col)
+                self.join.extend([self.from_table,list(common_col)[0]])
+                self.join.extend([join_to_table,list(common_col)[0]])
                 # TODO find the implicit join column
             self.parsedQuery['join'] = self.join
         if 'group' in tokenized_query:
